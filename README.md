@@ -12,7 +12,7 @@ Provides GithubTarget component for Yii2 logging system. Creates issues from app
 'components' => [
      'log' => [
           'targets' => [
-              [
+              'github' => [
                   'class' => 'webmayak\yii2LogGithub\GithubTarget',
                   'enabled' => true,
                   'except' => ['yii\web\HttpException:404', 'yii\web\HttpException:403'],
