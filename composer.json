@@ -1,0 +1,18 @@
+{
+  "name": "webmayak/yii2-log-github",
+  "type": "yii2-extension",
+  "authors": [
+    {
+      "name": "webmayak",
+      "email": "web-mayak@mail.ru"
+    }
+  ],
+  "require": {
+    "yiisoft/yii2-httpclient": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "webmayak\\yii2LogGithub\\": ""
+    }
+  }
+}
