@@ -37,33 +37,23 @@ class GithubTarget extends Target
 
     public function export()
     {
+        list($text, $level, $category, $timestamp) = $this->messages[0];
+        $prefix = $this->getMessagePrefix($this->messages[0]);
+        $title = "{$prefix}[$level][$category]";
+        
+        $messages = array_map([$this, 'formatMessage'], $this->messages);
+        $body = "```\n" . wordwrap(implode("\n", $messages), 70) . "\n```";
+        
         $client = new Client();
-        $request = $client->createRequest()
+        $response = $client->createRequest()
             ->setMethod('POST')
             ->setFormat(Client::FORMAT_JSON)
             ->setUrl("{$this->githubApiUrl}/repos/{$this->owner}/{$this->repository}/issues")
-            ->setHeaders(['Authorization' => "token {$this->accessToken}", 'User-Agent' => "{$this->userAgent}"]);
-
-        foreach ($this->messages as $message) {
-            list($text, $level, $category, $timestamp) = $message;
-            if (!is_string($text)) {
-                // exceptions may not be serializable if in the call stack somewhere is a Closure
-                if ($text instanceof \Throwable || $text instanceof \Exception) {
-                    $text = (string) $text;
-                } else {
-                    $text = VarDumper::export($text);
-                }
-            }
-            $prefix = $this->getMessagePrefix($message);
-
-            $request->setData([
-                'title' => "{$prefix}[$level][$category]",
-                'body' => $text
-            ]);
-            $response = $request->send();
-            if (!$response->isOk) {
-                throw new LogRuntimeException('Unable to export log through GithubTarget!');
-            }
+            ->setHeaders(['Authorization' => "token {$this->accessToken}", 'User-Agent' => "{$this->userAgent}"])
+            ->setData(['title' => $title, 'body' => $body])
+            ->send();
+        if (!$response->isOk) {
+            throw new LogRuntimeException('Unable to export log through GithubTarget!');
         }
     }
 }
